@@ -639,6 +639,10 @@ WITH all_records AS (
 	) AS ic WHERE ic.rnk = 1 ),
 	 cervical_cancer AS (select * from (select  ho.person_uuid AS person_uuid90, ho.date_of_observation AS dateOfCervicalCancerScreening,
 	ho.data ->> 'screenTreatmentMethodDate' AS treatmentMethodDate,cc_type.display AS cervicalCancerScreeningType,
+	-- Peter Start
+	cc_type.code AS cervicalCancerScreeningTypeCode,
+	cc_trtm.code AS cervicalCancerTreatmentScreenedCode,
+	-- Peter End
 	cc_method.display AS cervicalCancerScreeningMethod, cc_trtm.display AS cervicalCancerTreatmentScreened,
 	cc_result.display AS resultOfCervicalCancerScreening,
 	ROW_NUMBER() OVER (PARTITION BY ho.person_uuid ORDER BY ho.date_of_observation DESC) AS row
@@ -2123,16 +2127,19 @@ total_initiated_tpt_wide as (
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_lt5_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_15plus_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_15plus_6h,
-		-- 3HP
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as section_total_6h,
+		
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_lt5_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_lt5_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_15plus_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_15plus_3hp,
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as section_total_3hp,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_lt5_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_lt5_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_15plus_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_15plus_3rh,
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as section_total_3rh,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_male,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_female,
@@ -2148,7 +2155,8 @@ total_initiated_tpt AS (
 		(10, 'male_lt5_6H', w.male_lt5_6h), (11, 'female_lt5_6H', w.female_lt5_6h), (12, 'male_15plus_6H', w.male_15plus_6h), (13, 'female_15plus_6H', w.female_15plus_6h),
 		(14, 'male_lt5_3HP', w.male_lt5_3hp), (15, 'female_lt5_3HP', w.female_lt5_3hp), (16, 'male_15plus_3HP', w.male_15plus_3hp), (17, 'female_15plus_3HP', w.female_15plus_3hp),
 		(18, 'male_lt5_3RH', w.male_lt5_3rh), (19, 'female_lt5_3RH', w.female_lt5_3rh), (20, 'male_15plus_3RH', w.male_15plus_3rh), (21, 'female_15plus_3RH', w.female_15plus_3rh),
-		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'total', w.total)
+		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'section_total_6h', w.section_total_6h),
+		(25, 'section_total_3hp', w.section_total_3hp), (26, 'section_total_3rh', w.section_total_3rh), (27, 'total', w.total)
 	) kv(ord, columnKey, value)
 ),
 total_completed_tpt_wide as (
@@ -2167,16 +2175,19 @@ total_completed_tpt_wide as (
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_lt5_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_15plus_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_15plus_6h,
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_6h_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as section_total_completed_6h,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_lt5_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_lt5_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_15plus_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_15plus_3hp,
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3hp_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as section_total_completed_3hp,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_lt5_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_lt5_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_15plus_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_15plus_3rh,
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3rh_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as section_total_completed_3rh,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as total_male,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as total_female,
@@ -2192,7 +2203,8 @@ total_completed_tpt AS (
 		(10, 'male_lt5_6H', w.male_lt5_6h), (11, 'female_lt5_6H', w.female_lt5_6h), (12, 'male_15plus_6H', w.male_15plus_6h), (13, 'female_15plus_6H', w.female_15plus_6h),
 		(14, 'male_lt5_3HP', w.male_lt5_3hp), (15, 'female_lt5_3HP', w.female_lt5_3hp), (16, 'male_15plus_3HP', w.male_15plus_3hp), (17, 'female_15plus_3HP', w.female_15plus_3hp),
 		(18, 'male_lt5_3RH', w.male_lt5_3rh), (19, 'female_lt5_3RH', w.female_lt5_3rh), (20, 'male_15plus_3RH', w.male_15plus_3rh), (21, 'female_15plus_3RH', w.female_15plus_3rh),
-		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'total', w.total)
+		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'section_total_completed_6h', w.section_total_completed_6h),
+		(25, 'section_total_completed_3hp', w.section_total_completed_3hp), (26, 'section_total_completed_3rh', w.section_total_completed_3rh), (27, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 total_ever_received_tpt_wide as (
@@ -2212,16 +2224,19 @@ total_ever_received_tpt_wide as (
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_lt5_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_15plus_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_15plus_6h,
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as section_total_ever_6h,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_lt5_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_lt5_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_15plus_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_15plus_3hp,
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as section_total_ever_3hp,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_lt5_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_lt5_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_15plus_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_15plus_3rh,
+		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as section_total_ever_3rh,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and pharmacyTptEverReceivedDateRaw <= '2026-01-31' THEN uniquepersonuuid END) as total_male,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and pharmacyTptEverReceivedDateRaw <= '2026-01-31' THEN uniquepersonuuid END) as total_female,
@@ -2237,7 +2252,193 @@ total_ever_received_tpt AS (
 		(10, 'male_lt5_6H', w.male_lt5_6h), (11, 'female_lt5_6H', w.female_lt5_6h), (12, 'male_15plus_6H', w.male_15plus_6h), (13, 'female_15plus_6H', w.female_15plus_6h),
 		(14, 'male_lt5_3HP', w.male_lt5_3hp), (15, 'female_lt5_3HP', w.female_lt5_3hp), (16, 'male_15plus_3HP', w.male_15plus_3hp), (17, 'female_15plus_3HP', w.female_15plus_3hp),
 		(18, 'male_lt5_3RH', w.male_lt5_3rh), (19, 'female_lt5_3RH', w.female_lt5_3rh), (20, 'male_15plus_3RH', w.male_15plus_3rh), (21, 'female_15plus_3RH', w.female_15plus_3rh),
-		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'total', w.total)
+		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'section_total_ever_6h', w.section_total_ever_6h),
+		(25, 'section_total_ever_3hp', w.section_total_ever_3hp), (26, 'section_total_ever_3rh', w.section_total_ever_3rh), (27, 'total', w.total)
+		) kv(ord, columnKey, value)
+),
+total_cervical_cancer_wide as (
+	select
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '15-19' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as positive_1519,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '20-24' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as positive_2024,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '25-29' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as positive_2529,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '30-34' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as positive_3034,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '35-39' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as positive_3539,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '40-44' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as positive_4044,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '45-49' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as positive_4549,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '50+'   and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as positive_50plus,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' THEN uniquepersonuuid END) as total_positive,
+
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '15-19' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as negative_1519,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '20-24' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as negative_2024,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '25-29' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as negative_2529,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '30-34' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as negative_3034,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '35-39' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as negative_3539,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '40-44' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as negative_4044,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '45-49' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as negative_4549,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '50+'   and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as negative_50plus,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%negative%' THEN uniquepersonuuid END) as total_negative,
+
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '15-19' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as lesion_1519,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '20-24' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as lesion_2024,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '25-29' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as lesion_2529,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '30-34' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as lesion_3034,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '35-39' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as lesion_3539,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '40-44' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as lesion_4044,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '45-49' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as lesion_4549,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '50+'   and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as lesion_50plus,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%lesion%' THEN uniquepersonuuid END) as total_lesion,
+
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '15-19' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as suspected_1519,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '20-24' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as suspected_2024,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '25-29' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as suspected_2529,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '30-34' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as suspected_3034,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '35-39' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as suspected_3539,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '40-44' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as suspected_4044,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '45-49' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as suspected_4549,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '50+'   and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as suspected_50plus,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%SUSPICIOUS_FOR_CANCER%' THEN uniquepersonuuid END) as total_suspected,
+
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and cervicalCancerScreeningTypeCode = 'CERVICAL_CANCER_SCREENING_TYPE_FIRST_TIME_SCREENING' THEN uniquepersonuuid END) as type_first_time,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and cervicalCancerScreeningTypeCode = 'CERVICAL_CANCER_SCREENING_TYPE_FOLLOW-UP_AFTER_PREVIOUS_NEGATIVE_RESULT_OR_SUSPECTED_CANCER' THEN uniquepersonuuid END) as type_rescreening,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and cervicalCancerScreeningTypeCode = 'CERVICAL_CANCER_SCREENING_TYPE_POST-TREATMENT_FOLLOW-UP' THEN uniquepersonuuid END) as type_post_treatment,
+		
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total
+	FROM all_records
+),
+total_cervical_cancer AS (
+	SELECT
+		kv.ord,
+		'ART - 22' AS section,
+		'Number of women living with HIV on ART who have been screened for cervical cancer' as rowLabel,
+		kv.columnKey,
+		kv.value
+	FROM
+		total_cervical_cancer_wide w
+		CROSS JOIN LATERAL (
+			VALUES
+				(1, 'positive_1519', w.positive_1519),
+				(2, 'positive_2024', w.positive_2024),
+				(3, 'positive_2529', w.positive_2529),
+				(4, 'positive_3034', w.positive_3034),
+				(5, 'positive_3539', w.positive_3539),
+				(6, 'positive_4044', w.positive_4044),
+				(7, 'positive_4549', w.positive_4549),
+				(8, 'positive_50plus', w.positive_50plus),
+				
+				(9, 'negative_1519', w.negative_1519),
+				(10, 'negative_2024', w.negative_2024),
+				(11, 'negative_2529', w.negative_2529),
+				(12, 'negative_3034', w.negative_3034),
+				(13, 'negative_3539', w.negative_3539),
+				(14, 'negative_4044', w.negative_4044),
+				(15, 'negative_4549', w.negative_4549),
+				(16, 'negative_50plus', w.negative_50plus),
+
+				(17, 'lesion_1519', w.lesion_1519),
+				(18, 'lesion_2024', w.lesion_2024),
+				(19, 'lesion_2529', w.lesion_2529),
+				(20, 'lesion_3034', w.lesion_3034),
+				(21, 'lesion_3539', w.lesion_3539),
+				(22, 'lesion_4044', w.lesion_4044),
+				(23, 'lesion_4549', w.lesion_4549),
+				(24, 'lesion_50plus', w.lesion_50plus),
+
+				(25, 'suspected_1519', w.suspected_1519),
+				(26, 'suspected_2024', w.suspected_2024),
+				(27, 'suspected_2529', w.suspected_2529),
+				(28, 'suspected_3034', w.suspected_3034),
+				(29, 'suspected_3539', w.suspected_3539),
+				(30, 'suspected_4044', w.suspected_4044),
+				(31, 'suspected_4549', w.suspected_4549),
+				(32, 'suspected_50plus', w.suspected_50plus),
+
+				(33, 'type_first_time', w.type_first_time),
+				(34, 'type_rescreening', w.type_rescreening),
+				(35, 'type_post_treatment', w.type_post_treatment),
+				(36, 'total_positive', w.total_positive),
+				(37, 'total_negative', w.total_negative),
+				(38, 'total_lesion', w.total_lesion),
+				(39, 'total_suspected', w.total_suspected),
+
+				(40, 'total', w.total)
+		) kv(ord, columnKey, value)
+),
+total_cervical_cancer_treatment_wide as (
+	select
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '15-19' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as cryo_1519,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '20-24' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as cryo_2024,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '25-29' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as cryo_2529,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '30-34' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as cryo_3034,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '35-39' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as cryo_3539,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '40-44' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as cryo_4044,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '45-49' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as cryo_4549,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '50+'   and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as cryo_50plus,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' THEN uniquepersonuuid END) as total_cryotherapy,
+
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '15-19' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as thermal_1519,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '20-24' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as thermal_2024,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '25-29' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as thermal_2529,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '30-34' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as thermal_3034,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '35-39' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as thermal_3539,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '40-44' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as thermal_4044,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '45-49' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as thermal_4549,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '50+'   and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as thermal_50plus,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' THEN uniquepersonuuid END) as total_thermal_ablation,
+
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '15-19' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as leep_1519,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '20-24' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as leep_2024,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '25-29' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as leep_2529,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '30-34' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as leep_3034,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '35-39' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as leep_3539,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '40-44' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as leep_4044,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '45-49' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as leep_4549,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group = '50+'   and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as leep_50plus,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP' THEN uniquepersonuuid END) as total_leep,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfCervicalCancerScreening between '2026-01-01' and '2026-01-31' and resultOfCervicalCancerScreening ILIKE '%positive%' and (cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_CRYOTHERAPY' or cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT__THERMAL_ABLATION' or cervicalCancerTreatmentScreenedCode = 'CERVICAL_CANCER_TREATMENT_LEEP') THEN uniquepersonuuid END) as total
+		FROM all_records
+),
+total_cervical_cancer_treatment AS (
+	SELECT
+		kv.ord,
+		'ART - 23' AS section,
+		'Number of women living with HIV on ART who have been screened positive for cervical cancer and eligible for treatment who received cryotherapy, thermal ablation or LEEP' as rowLabel,
+		kv.columnKey,
+		kv.value
+	FROM
+		total_cervical_cancer_treatment_wide w
+		CROSS JOIN LATERAL (
+			VALUES
+				(1, 'cryo_1519', w.cryo_1519),
+				(2, 'cryo_2024', w.cryo_2024),
+				(3, 'cryo_2529', w.cryo_2529),
+				(4, 'cryo_3034', w.cryo_3034),
+				(5, 'cryo_3539', w.cryo_3539),
+				(6, 'cryo_4044', w.cryo_4044),
+				(7, 'cryo_4549', w.cryo_4549),
+				(8, 'cryo_50plus', w.cryo_50plus),
+				(9, 'total_cryotherapy', w.total_cryotherapy),
+				
+				(10, 'thermal_1519', w.thermal_1519),
+				(11, 'thermal_2024', w.thermal_2024),
+				(12, 'thermal_2529', w.thermal_2529),
+				(13, 'thermal_3034', w.thermal_3034),
+				(14, 'thermal_3539', w.thermal_3539),
+				(15, 'thermal_4044', w.thermal_4044),
+				(16, 'thermal_4549', w.thermal_4549),
+				(17, 'thermal_50plus', w.thermal_50plus),
+				(18, 'total_thermal_ablation', w.total_thermal_ablation),
+
+				(19, 'leep_1519', w.leep_1519),
+				(20, 'leep_2024', w.leep_2024),
+				(21, 'leep_2529', w.leep_2529),
+				(22, 'leep_3034', w.leep_3034),
+				(23, 'leep_3539', w.leep_3539),
+				(24, 'leep_4044', w.leep_4044),
+				(25, 'leep_4549', w.leep_4549),
+				(26, 'leep_50plus', w.leep_50plus),
+				(27, 'total_leep', w.total_leep),
+
+				(28, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 -- Peter End
@@ -2493,6 +2694,10 @@ UNION ALL
 select * from total_completed_tpt
 UNION ALL
 select * from total_ever_received_tpt
+UNION ALL
+select * from total_cervical_cancer
+UNION ALL
+select * from total_cervical_cancer_treatment
 -- Peter End
 UNION ALL
 select * from total_newly_art_enrolled
