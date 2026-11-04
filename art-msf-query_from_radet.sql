@@ -63,7 +63,7 @@ WITH all_records AS (
 	CASE
 	WHEN hac.tb_screen IS NOT NULL THEN hac.visit_date
 	ELSE NULL
-	END AS dateOfTbScreened1,
+	END AS dateOfTbScreened1, who_staging_id, cd4_data, cryptococcal_screening_status,
 	(CASE
 	WHEN INITCAP(pp.sex) = 'Male' THEN NULL
 	WHEN hac.pregnancy_status IS NOT NULL THEN preg.display
@@ -2239,9 +2239,222 @@ total_ever_received_tpt AS (
 		(18, 'male_lt5_3RH', w.male_lt5_3rh), (19, 'female_lt5_3RH', w.female_lt5_3rh), (20, 'male_15plus_3RH', w.male_15plus_3rh), (21, 'female_15plus_3RH', w.female_15plus_3rh),
 		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'total', w.total)
 		) kv(ord, columnKey, value)
-)
-
+),
 -- Peter End
+-- Chika Start
+total_plhiv_with_who_clinical_stage_3_and_4_wide as(
+select 
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )   THEN uniquepersonuuid END) as male_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as female_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as male_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as female_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as male_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as female_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) THEN uniquepersonuuid END) as total,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )   THEN uniquepersonuuid END) as male_newly_enrolled_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as female_newly_enrolled_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as male_newly_enrolled_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as female_newly_enrolled_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as male_newly_enrolled_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as female_newly_enrolled_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  THEN uniquepersonuuid END) as total_newly_enrolled,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as total_unsuppressed,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 )  and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and ((who_staging_id = '121' or who_staging_id = '122') or CAST(NULLIF(CAST(cd4_data->>'cd4_result' AS text), '') as numeric) < 200 ) and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as total_active_restart
+	
+	FROM all_records
+),
+total_plhiv_with_who_clinical_stage_3_and_4 AS (
+    SELECT
+		kv.ord,
+		'ART - 18' AS section,
+		'Number of people living with HIV with WHO clinical stages 3 and 4 and/or CD4 <200c/mm3 and children  ≤ 5 years (Advanced HIV Disease)' as rowLabel,
+		kv.columnKey,
+		kv.value
+    FROM total_plhiv_with_who_clinical_stage_3_and_4_wide w
+    CROSS JOIN LATERAL (
+        VALUES
+            (1, 'male_lt5', w.male_lt5),
+            (2, 'female_lt5', w.female_lt5),
+            (3, 'male_514', w.male_514),
+            (4, 'female_514', w.female_514),
+            (5, 'male_15plus', w.male_15plus),
+            (6, 'female_15plus', w.female_15plus),
+            (7, 'total', w.total),
+            (8, 'male_newly_enrolled_lt5', w.male_newly_enrolled_lt5),
+            (9, 'female_newly_enrolled_lt5', w.female_newly_enrolled_lt5),
+            (10, 'male_newly_enrolled_514', w.male_newly_enrolled_514),
+            (11, 'female_newly_enrolled_514', w.female_newly_enrolled_514),
+            (12, 'male_newly_enrolled_15plus', w.male_newly_enrolled_15plus),
+            (13, 'female_newly_enrolled_15plus', w.female_newly_enrolled_15plus),
+            (14, 'total_newly_enrolled', w.total_newly_enrolled),
+            (15, 'male_unsuppressed_lt5', w.male_unsuppressed_lt5),
+            (16, 'female_unsuppressed_lt5', w.female_unsuppressed_lt5),
+            (17, 'male_unsuppressed_514', w.male_unsuppressed_514),
+            (18, 'male_unsuppressed_15plus', w.male_unsuppressed_15plus),
+            (19, 'female_unsuppressed_15plus', w.female_unsuppressed_15plus),
+            (20, 'total_unsuppressed', w.total_unsuppressed),
+            (21, 'male_active_restart_lt5', w.male_active_restart_lt5),
+            (22, 'female_active_restart_lt5', w.female_active_restart_lt5),
+            (23, 'male_active_restart_514', w.male_active_restart_514),
+            (24, 'female_active_restart_514', w.female_active_restart_514),
+            (25, 'male_active_restart_15plus', w.male_active_restart_15plus),
+            (26, 'female_active_restart_15plus', w.female_active_restart_15plus),
+            (27, 'total_active_restart', w.total_active_restart)
+    ) kv(ord,columnKey,value)
+),
+total_plhiv_with_ahd_screened_cryptococcal_wide as(
+select 
+	--Negative
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'  THEN uniquepersonuuid END) as male_negative_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as female_negative_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as male_negative_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as female_negative_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as male_negative_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as female_negative_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'THEN uniquepersonuuid END) as total_negative,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'  THEN uniquepersonuuid END) as male_newly_enrolled_negative_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as female_newly_enrolled_negative_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as male_newly_enrolled_negative_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as female_newly_enrolled_negative_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as male_newly_enrolled_negative_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as female_newly_enrolled_negative_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' THEN uniquepersonuuid END) as total_newly_enrolled_negative,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_negative_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_negative_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_negative_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_negative_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_negative_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_negative_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as total_unsuppressed_negative,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE' and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_negative_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_negative_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_negative_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_negative_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_negative_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_negative_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_NEGATIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as total_active_restart_negative,
+	
+	--Positive
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'  THEN uniquepersonuuid END) as male_positive_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as female_positive_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as male_positive_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as female_positive_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as male_positive_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as female_positive_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'THEN uniquepersonuuid END) as total_positive,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'  THEN uniquepersonuuid END) as male_newly_enrolled_positive_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as female_newly_enrolled_positive_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as male_newly_enrolled_positive_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as female_newly_enrolled_positive_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as male_newly_enrolled_positive_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as female_newly_enrolled_positive_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' THEN uniquepersonuuid END) as total_newly_enrolled_positive,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_positive_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_positive_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_positive_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_positive_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as male_unsuppressed_positive_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as female_unsuppressed_positive_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and  (EXTRACT(YEAR FROM AGE(CURRENT_DATE, artstartdate)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, artstartdate)) >= 6) and (currentviralload is not null or currentviralload != 'Failed') and (EXTRACT(YEAR FROM AGE(CURRENT_DATE, dateofcurrentviralload)) * 12 + EXTRACT(MONTH FROM AGE(CURRENT_DATE, dateofcurrentviralload)) <12 and currentviralload::int > 1000) THEN uniquepersonuuid END) as total_unsuppressed_positive,
+	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE' and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_positive_lt5, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years < 5  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_positive_lt5,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_positive_514, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years between 5 and 14  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_positive_514,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male'   and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as male_active_restart_positive_15plus, 
+	count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_years >=15  and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as female_active_restart_positive_15plus,	
+	count(distinct CASE WHEN uniquepersonuuid is not null and dateenrolled between '2026-01-01' and '2026-01-31' and visit_date BETWEEN '2026-01-01' AND CURRENT_DATE and cryptococcal_screening_status = 'CRYPTOCOCCAL_SCREENING_STATUS_CR_AG_POSITIVE'and lower(currentstatus) = 'active restart'  THEN uniquepersonuuid END) as total_active_restart_positive
+	
+	FROM all_records
+),
+total_plhiv_with_ahd_screened_cryptococcal AS (
+    SELECT
+		kv.ord,
+		'ART - 19' AS section,
+		'Number of people living with HIV with AHD screened for serum Cryptococcal Antigen (Serum CrAg Negative)' as rowLabel,
+		kv.columnKey,
+		kv.value
+    FROM total_plhiv_with_ahd_screened_cryptococcal_wide w
+    CROSS JOIN LATERAL (
+        VALUES
+            (1, 'male_negative_lt5', w.male_negative_lt5),
+            (2, 'female_negative_lt5', w.female_negative_lt5),
+            (3, 'male_negative_514', w.male_negative_514),
+            (4, 'female_negative_514', w.female_negative_514),
+            (5, 'male_negative_15plus', w.male_negative_15plus),
+            (6, 'female_negative_15plus', w.female_negative_15plus),
+            (7, 'total_negative', w.total_negative),
+            (8, 'male_newly_enrolled_negative_lt5', w.male_newly_enrolled_negative_lt5),
+            (9, 'female_newly_enrolled_negative_lt5', w.female_newly_enrolled_negative_lt5),
+            (10, 'male_newly_enrolled_negative_514', w.male_newly_enrolled_negative_514),
+            (11, 'female_newly_enrolled_negative_514', w.female_newly_enrolled_negative_514),
+            (12, 'male_newly_enrolled_negative_15plus', w.male_newly_enrolled_negative_15plus),
+            (13, 'female_newly_enrolled_negative_15plus', w.female_newly_enrolled_negative_15plus),
+            (14, 'total_newly_enrolled_negative', w.total_newly_enrolled_negative),
+            (15, 'male_unsuppressed_negative_lt5', w.male_unsuppressed_negative_lt5),
+            (16, 'female_unsuppressed_negative_lt5', w.female_unsuppressed_negative_lt5),
+            (17, 'male_unsuppressed_negative_514', w.male_unsuppressed_negative_514),
+            (18, 'male_unsuppressed_negative_15plus', w.male_unsuppressed_negative_15plus),
+            (19, 'female_unsuppressed_negative_15plus', w.female_unsuppressed_negative_15plus),
+            (20, 'total_unsuppressed_negative', w.total_unsuppressed_negative),
+            (21, 'male_active_restart_negative_lt5', w.male_active_restart_negative_lt5),
+            (22, 'female_active_restart_negative_lt5', w.female_active_restart_negative_lt5),
+            (23, 'male_active_restart_negative_514', w.male_active_restart_negative_514),
+            (24, 'female_active_restart_negative_514', w.female_active_restart_negative_514),
+            (25, 'male_active_restart_negative_15plus', w.male_active_restart_negative_15plus),
+            (26, 'female_active_restart_negative_15plus', w.female_active_restart_negative_15plus),
+            (27, 'total_active_restart_negative', w.total_active_restart_negative),
+			
+            (1, 'male_positive_lt5', w.male_positive_lt5),
+            (2, 'female_positive_lt5', w.female_positive_lt5),
+            (3, 'male_positive_514', w.male_positive_514),
+            (4, 'female_positive_514', w.female_positive_514),
+            (5, 'male_positive_15plus', w.male_positive_15plus),
+            (6, 'female_positive_15plus', w.female_positive_15plus),
+            (7, 'total_positive', w.total_positive),
+            (8, 'male_newly_enrolled_positive_lt5', w.male_newly_enrolled_positive_lt5),
+            (9, 'female_newly_enrolled_positive_lt5', w.female_newly_enrolled_positive_lt5),
+            (10, 'male_newly_enrolled_positive_514', w.male_newly_enrolled_positive_514),
+            (11, 'female_newly_enrolled_positive_514', w.female_newly_enrolled_positive_514),
+            (12, 'male_newly_enrolled_positive_15plus', w.male_newly_enrolled_positive_15plus),
+            (13, 'female_newly_enrolled_positive_15plus', w.female_newly_enrolled_positive_15plus),
+            (14, 'total_newly_enrolled_positive', w.total_newly_enrolled_positive),
+            (15, 'male_unsuppressed_positive_lt5', w.male_unsuppressed_positive_lt5),
+            (16, 'female_unsuppressed_positive_lt5', w.female_unsuppressed_positive_lt5),
+            (17, 'male_unsuppressed_positive_514', w.male_unsuppressed_positive_514),
+            (18, 'male_unsuppressed_positive_15plus', w.male_unsuppressed_positive_15plus),
+            (19, 'female_unsuppressed_positive_15plus', w.female_unsuppressed_positive_15plus),
+            (20, 'total_unsuppressed_positive', w.total_unsuppressed_positive),
+            (21, 'male_active_restart_positive_lt5', w.male_active_restart_positive_lt5),
+            (22, 'female_active_restart_positive_lt5', w.female_active_restart_positive_lt5),
+            (23, 'male_active_restart_positive_514', w.male_active_restart_positive_514),
+            (24, 'female_active_restart_positive_514', w.female_active_restart_positive_514),
+            (25, 'male_active_restart_positive_15plus', w.male_active_restart_positive_15plus),
+            (26, 'female_active_restart_positive_15plus', w.female_active_restart_positive_15plus),
+            (27, 'total_active_restart_positive', w.total_active_restart_positive)
+    ) kv(ord,columnKey,value)
+)
 select * from total_newly_art_started
 UNION ALL
 select * from total_receiving_art_1st_line
@@ -2263,8 +2476,6 @@ UNION ALL
 select * from total_receiving_art_transferred_out
 UNION ALL
 select * from total_receiving_art_transferred_in
-UNION ALL
-select * from total_newly_art_enrolled
 -- Peter Start
 UNION ALL
 select * from total_clinically_screened_tb
@@ -2283,3 +2494,9 @@ select * from total_completed_tpt
 UNION ALL
 select * from total_ever_received_tpt
 -- Peter End
+UNION ALL
+select * from total_newly_art_enrolled
+UNION ALL
+select * from total_plhiv_with_who_clinical_stage_3_and_4
+UNION ALL
+select * from total_plhiv_with_ahd_screened_cryptococcal
