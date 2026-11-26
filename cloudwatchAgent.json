@@ -1,0 +1,148 @@
+{
+  "agent": {
+    "metrics_collection_interval": 60,
+    "run_as_user": "cwagent",
+    "region": "af-south-1",
+    "usage_metadata": [
+      {
+        "ObservabilitySolution": "ec2_health"
+      }
+    ]
+  },
+  "metrics": {
+    "namespace": "CWAgent",
+    "append_dimensions": {
+      "InstanceId": "${aws:InstanceId}",
+      "InstanceType": "${aws:InstanceType}",
+      "ImageId": "${aws:ImageId}",
+      "AutoScalingGroupName": "${aws:AutoScalingGroupName}"
+    },
+    "aggregation_dimensions": [
+      [
+        "InstanceId"
+      ]
+    ],
+    "metrics_collected": {
+      "cpu": {
+        "measurement": [
+          "cpu_usage_idle",
+          "cpu_usage_iowait",
+          "cpu_usage_user",
+          "cpu_usage_system",
+          "cpu_usage_active"
+        ]
+      },
+
+      "load": {
+        "measurement": [
+          "load_1",
+          "load_5",
+          "load_15"
+        ]
+      },
+
+      "mem": {
+        "measurement": [
+          "mem_used_percent",
+          "mem_available",
+          "mem_used",
+          "mem_cached",
+          "mem_buffered"
+        ]
+      },
+
+      "swap": {
+        "measurement": [
+          "swap_used_percent",
+          "swap_used",
+          "swap_free"
+        ]
+      },
+
+      "disk": {
+        "measurement": [
+          "disk_inodes_free",
+          "disk_used_percent"
+        ],
+        "drop_device": true
+      },
+
+      "diskio": {
+        "measurement": [
+          "diskio_io_time",
+          "diskio_read_bytes",
+          "diskio_write_bytes",
+          "diskio_reads",
+          "diskio_writes",
+          "diskio_read_time",
+          "diskio_write_time",
+          "diskio_iops_in_progress"
+        ]
+      },
+
+      "net": {
+        "measurement": [
+          "net_bytes_recv",
+          "net_bytes_sent",
+          "net_packets_recv",
+          "net_packets_sent",
+          "net_err_in",
+          "net_err_out",
+          "net_drop_in",
+          "net_drop_out"
+        ]
+      },
+
+      "netstat": {
+        "measurement": [
+          "netstat_tcp_established",
+          "netstat_tcp_time_wait"
+        ]
+      },
+
+      "processes": {
+        "measurement": [
+          "processes_running",
+          "processes_total",
+          "processes_sleeping",
+          "processes_blocked",
+          "processes_zombies"
+        ]
+      },
+
+      "procstat": [
+        {
+          "pattern": "nginx"
+        },
+        {
+          "pattern": "postgres"
+        },
+        {
+          "pattern": "docker"
+        }
+      ],
+
+      "ethtool": {
+        "metrics_include": [
+          "bw_in_allowance_exceeded",
+          "bw_out_allowance_exceeded",
+          "conntrack_allowance_exceeded",
+          "linklocal_allowance_exceeded",
+          "pps_allowance_exceeded"
+        ]
+      },
+
+      "ebs": {
+        "measurement": [
+          "ebs_read_ops",
+          "ebs_write_ops",
+          "ebs_read_bytes",
+          "ebs_write_bytes",
+          "volume_queue_length",
+          "ebs_total_read_time",
+          "ebs_total_write_time"
+        ]
+      }
+    }
+  }
+}

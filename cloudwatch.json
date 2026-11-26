@@ -1,0 +1,13 @@
+{
+  "metrics": {
+    "metrics_collected": {
+      "load": {
+        "measurement": [
+          "load_1",
+          "load_5",
+          "load_15"
+        ]
+      }
+    }
+  }
+}
