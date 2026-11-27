@@ -1730,15 +1730,10 @@ total_clinically_screened_tb_wide as (
 	select
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as male_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as female_lt5,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as total_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as male_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as female_514,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as total_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as male_15plus,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as female_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as total_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as total_male,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as total_female,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus IS NOT NULL THEN uniquepersonuuid END) as total
 	FROM all_records
 ),
@@ -1755,31 +1750,21 @@ total_clinically_screened_tb AS (
 			VALUES
 				(1, 'male_lt5', w.male_lt5),
 				(2, 'female_lt5', w.female_lt5),
-				(3, 'total_lt5', w.total_lt5),
-				(4, 'male_514', w.male_514),
-				(5, 'female_514', w.female_514),
-				(6, 'total_514', w.total_514),
-				(7, 'male_15plus', w.male_15plus),
-				(8, 'female_15plus', w.female_15plus),
-				(9, 'total_15plus', w.total_15plus),
-				(10, 'total_male', w.total_male),
-				(11, 'total_female', w.total_female),
-				(12, 'total', w.total)
+				(3, 'male_514', w.male_514),
+				(4, 'female_514', w.female_514),
+				(5, 'male_15plus', w.male_15plus),
+				(6, 'female_15plus', w.female_15plus),
+				(7, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 total_presumptive_tb_wide as (
 	select
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as male_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as female_lt5,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as total_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as male_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as female_514,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as total_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as male_15plus,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as female_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as total_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as total_male,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as total_female,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' THEN uniquepersonuuid END) as total
 	FROM all_records
 ),
@@ -1796,31 +1781,21 @@ total_presumptive_tb AS (
 			VALUES
 				(1, 'male_lt5', w.male_lt5),
 				(2, 'female_lt5', w.female_lt5),
-				(3, 'total_lt5', w.total_lt5),
-				(4, 'male_514', w.male_514),
-				(5, 'female_514', w.female_514),
-				(6, 'total_514', w.total_514),
-				(7, 'male_15plus', w.male_15plus),
-				(8, 'female_15plus', w.female_15plus),
-				(9, 'total_15plus', w.total_15plus),
-				(10, 'total_male', w.total_male),
-				(11, 'total_female', w.total_female),
-				(12, 'total', w.total)
+				(3, 'male_514', w.male_514),
+				(4, 'female_514', w.female_514),
+				(5, 'male_15plus', w.male_15plus),
+				(6, 'female_15plus', w.female_15plus),
+				(7, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 total_presumptive_tb_tested_wide as (
 	select
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_lt5,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_514,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_15plus,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_male,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_female,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and dateOfTbScreened between '2026-01-01' and '2026-01-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total
 	FROM all_records
 ),
@@ -1837,31 +1812,21 @@ total_presumptive_tb_tested AS (
 			VALUES
 				(1, 'male_lt5', w.male_lt5),
 				(2, 'female_lt5', w.female_lt5),
-				(3, 'total_lt5', w.total_lt5),
-				(4, 'male_514', w.male_514),
-				(5, 'female_514', w.female_514),
-				(6, 'total_514', w.total_514),
-				(7, 'male_15plus', w.male_15plus),
-				(8, 'female_15plus', w.female_15plus),
-				(9, 'total_15plus', w.total_15plus),
-				(10, 'total_male', w.total_male),
-				(11, 'total_female', w.total_female),
-				(12, 'total', w.total)
+				(3, 'male_514', w.male_514),
+				(4, 'female_514', w.female_514),
+				(5, 'male_15plus', w.male_15plus),
+				(6, 'female_15plus', w.female_15plus),
+				(7, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 total_active_tb_disease_wide as (
 	select
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as male_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as female_lt5,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as male_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as female_514,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as male_15plus,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as female_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_male,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_female,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total
 	FROM all_records
 ),
@@ -1878,31 +1843,21 @@ total_active_tb_disease AS (
 			VALUES
 				(1, 'male_lt5', w.male_lt5),
 				(2, 'female_lt5', w.female_lt5),
-				(3, 'total_lt5', w.total_lt5),
-				(4, 'male_514', w.male_514),
-				(5, 'female_514', w.female_514),
-				(6, 'total_514', w.total_514),
-				(7, 'male_15plus', w.male_15plus),
-				(8, 'female_15plus', w.female_15plus),
-				(9, 'total_15plus', w.total_15plus),
-				(10, 'total_male', w.total_male),
-				(11, 'total_female', w.total_female),
-				(12, 'total', w.total)
+				(3, 'male_514', w.male_514),
+				(4, 'female_514', w.female_514),
+				(5, 'male_15plus', w.male_15plus),
+				(6, 'female_15plus', w.female_15plus),
+				(7, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 total_initiated_tb_treatment_wide as (
 	select
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as male_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as female_lt5,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('<1', '1-4') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as male_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as female_514,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as male_15plus,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as female_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_male,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total_female,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and dateOfTbScreened between '2025-01-01' and '2026-12-31' and tbStatus = 'Presumptive TB' and specimenSentDate between '2025-01-01' and '2026-12-31' and dateOfTbPositiveResult between '2025-01-01' and '2026-12-31' and tbTreatmentStartDateRaw between '2025-01-01' and '2026-12-31' THEN uniquepersonuuid END) as total
 	FROM all_records
 ),
@@ -1919,77 +1874,70 @@ total_initiated_tb_treatment AS (
 			VALUES
 				(1, 'male_lt5', w.male_lt5),
 				(2, 'female_lt5', w.female_lt5),
-				(3, 'total_lt5', w.total_lt5),
-				(4, 'male_514', w.male_514),
-				(5, 'female_514', w.female_514),
-				(6, 'total_514', w.total_514),
-				(7, 'male_15plus', w.male_15plus),
-				(8, 'female_15plus', w.female_15plus),
-				(9, 'total_15plus', w.total_15plus),
-				(10, 'total_male', w.total_male),
-				(11, 'total_female', w.total_female),
-				(12, 'total', w.total)
+				(3, 'male_514', w.male_514),
+				(4, 'female_514', w.female_514),
+				(5, 'male_15plus', w.male_15plus),
+				(6, 'female_15plus', w.female_15plus),
+				(7, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 total_initiated_tpt_wide as (
 	select
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_lt5,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_514,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_15plus,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_15plus,
 		
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_lt5_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_lt5_6h,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_514_6h,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_514_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_15plus_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_15plus_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_6h_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as section_total_6h,
 		
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_lt5_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_lt5_3hp,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_514_3hp,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_514_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_15plus_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_15plus_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3hp_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as section_total_3hp,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_lt5_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_lt5_3rh,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_514_3rh,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_514_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as male_15plus_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as female_15plus_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3rh_start_date between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as section_total_3rh,
 
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_male,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total_female,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharmacyTptStartDateRaw between '2026-01-01' and '2026-01-31' THEN uniquepersonuuid END) as total
 	FROM all_records
 ),
 total_initiated_tpt AS (
 	SELECT kv.ord, 'ART - 14' AS section, 'Number of people living with HIV on ART who initiated TB preventive treatment (TPT)' as rowLabel, kv.columnKey, kv.value
 	FROM total_initiated_tpt_wide w CROSS JOIN LATERAL (VALUES
-		(1, 'male_lt5', w.male_lt5), (2, 'female_lt5', w.female_lt5), (3, 'total_lt5', w.total_lt5),
-		(4, 'male_514', w.male_514), (5, 'female_514', w.female_514), (6, 'total_514', w.total_514),
-		(7, 'male_15plus', w.male_15plus), (8, 'female_15plus', w.female_15plus), (9, 'total_15plus', w.total_15plus),
-		(10, 'male_lt5_6H', w.male_lt5_6h), (11, 'female_lt5_6H', w.female_lt5_6h), (12, 'male_15plus_6H', w.male_15plus_6h), (13, 'female_15plus_6H', w.female_15plus_6h),
-		(14, 'male_lt5_3HP', w.male_lt5_3hp), (15, 'female_lt5_3HP', w.female_lt5_3hp), (16, 'male_15plus_3HP', w.male_15plus_3hp), (17, 'female_15plus_3HP', w.female_15plus_3hp),
-		(18, 'male_lt5_3RH', w.male_lt5_3rh), (19, 'female_lt5_3RH', w.female_lt5_3rh), (20, 'male_15plus_3RH', w.male_15plus_3rh), (21, 'female_15plus_3RH', w.female_15plus_3rh),
-		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'section_total_6h', w.section_total_6h),
-		(25, 'section_total_3hp', w.section_total_3hp), (26, 'section_total_3rh', w.section_total_3rh), (27, 'total', w.total)
+		(1, 'male_lt5', w.male_lt5), (2, 'female_lt5', w.female_lt5), (3, 'male_514', w.male_514), 
+		(4, 'female_514', w.female_514), (5, 'male_15plus', w.male_15plus), (6, 'female_15plus', w.female_15plus), 
+		(7, 'male_lt5_6H', w.male_lt5_6h), (8, 'female_lt5_6H', w.female_lt5_6h), (9, 'male_15plus_6H', w.male_15plus_6h), 
+		(10, 'female_15plus_6H', w.female_15plus_6h), (11, 'male_lt5_3HP', w.male_lt5_3hp), (12, 'female_lt5_3HP', w.female_lt5_3hp), 
+		(13, 'male_15plus_3HP', w.male_15plus_3hp), (14, 'female_15plus_3HP', w.female_15plus_3hp), (15, 'male_lt5_3RH', w.male_lt5_3rh), 
+		(16, 'female_lt5_3RH', w.female_lt5_3rh), (17, 'male_15plus_3RH', w.male_15plus_3rh), (18, 'female_15plus_3RH', w.female_15plus_3rh),
+		(19, 'section_total_6h', w.section_total_6h), (20, 'section_total_3hp', w.section_total_3hp), (21, 'section_total_3rh', w.section_total_3rh), 
+		(22, 'total', w.total)
 	) kv(ord, columnKey, value)
 ),
 total_completed_tpt_wide as (
 	select
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_lt5,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as total_lt5,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_514,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as total_514,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_15plus,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_15plus,
-		count(distinct CASE WHEN uniquepersonuuid is not null and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as total_15plus,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as male_lt5_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_lt5_6h,
@@ -2009,22 +1957,20 @@ total_completed_tpt_wide as (
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as female_15plus_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3rh_start_date IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as section_total_completed_3rh,
 
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as total_male,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as total_female,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharmacyTptStartDateRaw IS NOT NULL and tptCompletionDateRaw between '2026-01-01' and '2026-01-31' and tptCompletionStatusRaw = 'Treatment Completed' THEN uniquepersonuuid END) as total
 		FROM all_records
 ),
 total_completed_tpt AS (
 		SELECT kv.ord, 'ART - 15' AS section, 'Number of people living with HIV on ART who completed a course of TB preventive treatment among those who initiated TPT' as rowLabel, kv.columnKey, kv.value
 		FROM total_completed_tpt_wide w CROSS JOIN LATERAL (VALUES
-		(1, 'male_lt5', w.male_lt5), (2, 'female_lt5', w.female_lt5), (3, 'total_lt5', w.total_lt5),
-		(4, 'male_514', w.male_514), (5, 'female_514', w.female_514), (6, 'total_514', w.total_514),
-		(7, 'male_15plus', w.male_15plus), (8, 'female_15plus', w.female_15plus), (9, 'total_15plus', w.total_15plus),
-		(10, 'male_lt5_6H', w.male_lt5_6h), (11, 'female_lt5_6H', w.female_lt5_6h), (12, 'male_15plus_6H', w.male_15plus_6h), (13, 'female_15plus_6H', w.female_15plus_6h),
-		(14, 'male_lt5_3HP', w.male_lt5_3hp), (15, 'female_lt5_3HP', w.female_lt5_3hp), (16, 'male_15plus_3HP', w.male_15plus_3hp), (17, 'female_15plus_3HP', w.female_15plus_3hp),
-		(18, 'male_lt5_3RH', w.male_lt5_3rh), (19, 'female_lt5_3RH', w.female_lt5_3rh), (20, 'male_15plus_3RH', w.male_15plus_3rh), (21, 'female_15plus_3RH', w.female_15plus_3rh),
-		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'section_total_completed_6h', w.section_total_completed_6h),
-		(25, 'section_total_completed_3hp', w.section_total_completed_3hp), (26, 'section_total_completed_3rh', w.section_total_completed_3rh), (27, 'total', w.total)
+		(1, 'male_lt5', w.male_lt5), (2, 'female_lt5', w.female_lt5), (3, 'male_514', w.male_514), 
+		(4, 'female_514', w.female_514), (5, 'male_15plus', w.male_15plus), (6, 'female_15plus', w.female_15plus), 
+		(7, 'male_lt5_6H', w.male_lt5_6h), (8, 'female_lt5_6H', w.female_lt5_6h), (9, 'male_15plus_6H', w.male_15plus_6h), 
+		(10, 'female_15plus_6H', w.female_15plus_6h), (11, 'male_lt5_3HP', w.male_lt5_3hp), (12, 'female_lt5_3HP', w.female_lt5_3hp), 
+		(13, 'male_15plus_3HP', w.male_15plus_3hp), (14, 'female_15plus_3HP', w.female_15plus_3hp), (15, 'male_lt5_3RH', w.male_lt5_3rh), 
+		(16, 'female_lt5_3RH', w.female_lt5_3rh), (17, 'male_15plus_3RH', w.male_15plus_3rh), (18, 'female_15plus_3RH', w.female_15plus_3rh),
+		(19, 'section_total_completed_6h', w.section_total_completed_6h), (20, 'section_total_completed_3hp', w.section_total_completed_3hp), (21, 'section_total_completed_3rh', w.section_total_completed_3rh), 
+		(22, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 total_ever_received_tpt_wide as (
@@ -2042,38 +1988,42 @@ total_ever_received_tpt_wide as (
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_lt5_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_lt5_6h,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_514_6h,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_514_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_15plus_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_15plus_6h,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_6h_any_date <= '2026-01-31' THEN uniquepersonuuid END) as section_total_ever_6h,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_lt5_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_lt5_3hp,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_514_3hp,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_514_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_15plus_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_15plus_3hp,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3hp_any_date <= '2026-01-31' THEN uniquepersonuuid END) as section_total_ever_3hp,
 
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_lt5_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('<1', '1-4') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_lt5_3rh,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_514_3rh,
+		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group IN ('5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_514_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as male_15plus_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and age_group NOT IN ('<1', '1-4', '5-9', '10-14') and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as female_15plus_3rh,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharm_3rh_any_date <= '2026-01-31' THEN uniquepersonuuid END) as section_total_ever_3rh,
 
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Male' and currentstatus = 'Active' and pharmacyTptEverReceivedDateRaw <= '2026-01-31' THEN uniquepersonuuid END) as total_male,
-		count(distinct CASE WHEN uniquepersonuuid is not null and gender = 'Female' and currentstatus = 'Active' and pharmacyTptEverReceivedDateRaw <= '2026-01-31' THEN uniquepersonuuid END) as total_female,
 		count(distinct CASE WHEN uniquepersonuuid is not null and currentstatus = 'Active' and pharmacyTptEverReceivedDateRaw <= '2026-01-31' THEN uniquepersonuuid END) as total
 		FROM all_records
 ),
 total_ever_received_tpt AS (
 		SELECT kv.ord, 'ART - 16' AS section, 'Number of people living with HIV currently on ART who had ever received TB preventive treatment (TPT)' as rowLabel, kv.columnKey, kv.value
 		FROM total_ever_received_tpt_wide w CROSS JOIN LATERAL (VALUES
-		(1, 'male_lt5', w.male_lt5), (2, 'female_lt5', w.female_lt5), (3, 'total_lt5', w.total_lt5),
-		(4, 'male_514', w.male_514), (5, 'female_514', w.female_514), (6, 'total_514', w.total_514),
-		(7, 'male_15plus', w.male_15plus), (8, 'female_15plus', w.female_15plus), (9, 'total_15plus', w.total_15plus),
-		(10, 'male_lt5_6H', w.male_lt5_6h), (11, 'female_lt5_6H', w.female_lt5_6h), (12, 'male_15plus_6H', w.male_15plus_6h), (13, 'female_15plus_6H', w.female_15plus_6h),
-		(14, 'male_lt5_3HP', w.male_lt5_3hp), (15, 'female_lt5_3HP', w.female_lt5_3hp), (16, 'male_15plus_3HP', w.male_15plus_3hp), (17, 'female_15plus_3HP', w.female_15plus_3hp),
-		(18, 'male_lt5_3RH', w.male_lt5_3rh), (19, 'female_lt5_3RH', w.female_lt5_3rh), (20, 'male_15plus_3RH', w.male_15plus_3rh), (21, 'female_15plus_3RH', w.female_15plus_3rh),
-		(22, 'total_male', w.total_male), (23, 'total_female', w.total_female), (24, 'section_total_ever_6h', w.section_total_ever_6h),
-		(25, 'section_total_ever_3hp', w.section_total_ever_3hp), (26, 'section_total_ever_3rh', w.section_total_ever_3rh), (27, 'total', w.total)
+		(1, 'male_lt5', w.male_lt5), (2, 'female_lt5', w.female_lt5), (3, 'male_514', w.male_514), 
+		(4, 'female_514', w.female_514), (5, 'male_15plus', w.male_15plus), (6, 'female_15plus', w.female_15plus), 
+		(7, 'male_lt5_6H', w.male_lt5_6h), (8, 'female_lt5_6H', w.female_lt5_6h), (9, 'male_15plus_6H', w.male_15plus_6h), 
+		(10, 'female_15plus_6H', w.female_15plus_6h), (11, 'male_lt5_3HP', w.male_lt5_3hp), (12, 'female_lt5_3HP', w.female_lt5_3hp), 
+		(13, 'male_15plus_3HP', w.male_15plus_3hp), (14, 'female_15plus_3HP', w.female_15plus_3hp), (15, 'male_lt5_3RH', w.male_lt5_3rh), 
+		(16, 'female_lt5_3RH', w.female_lt5_3rh), (17, 'male_15plus_3RH', w.male_15plus_3rh), (18, 'female_15plus_3RH', w.female_15plus_3rh),
+		(19, 'section_total_ever_6h', w.section_total_ever_6h), (20, 'section_total_ever_3hp', w.section_total_ever_3hp), (21, 'section_total_ever_3rh', w.section_total_ever_3rh), 
+		(22, 'total', w.total)
 		) kv(ord, columnKey, value)
 ),
 total_newly_art_enrolled_wide as(
